@@ -3,10 +3,10 @@
 !/.gitignore
 !/.gitignore_global
 !/.vimrc
-!/.config/i3/*
-!/.config/polybar/*
+!/.config/i3
+!/.config/polybar
+!/.config/terminator
 !/.git_hooks/*
 !/.Xresources
 !/.zshrc
-!/.terminator/config
 
