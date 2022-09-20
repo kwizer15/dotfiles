@@ -1,0 +1,23 @@
+# Ceci est le fichier de configuration personnel de Git.
+[user]
+# Veuillez adapter et décommenter les lignes suivantes :
+	name = KwiZeR15
+	email = kwizer15@gmail.com
+
+[alias]
+	co = checkout
+	ci = commit
+	st = status
+	br = branch
+	lg = log --pretty=oneline --abbrev-commit --graph
+	changes = diff --name-status
+	undo = reset --soft HEAD^
+	amend = commit --amend
+	rbc = rebase --continue
+	rba = rebase --abort
+	rbs = rebase --skip
+	
+[core]
+	excludesfile = ~/.gitignore_global
+	editor = vim
+	hooksPath = /home/emmanuel/.git_hooks

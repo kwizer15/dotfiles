@@ -1,0 +1,12 @@
+*
+!/.gitconfig
+!/.gitignore
+!/.gitignore_global
+!/.vimrc
+!/.config/i3/*
+!/.config/polybar/*
+!/.git_hooks/*
+!/.Xresources
+!/.zshrc
+!/.terminator/config
+

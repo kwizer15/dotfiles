@@ -1,0 +1,6 @@
+.idea
+*.mk
+test.php
+.mydocs
+.vimrc
+
