@@ -5,6 +5,7 @@
 !/.vimrc
 !/.config/i3
 !/.config/polybar
+!/.config/picom.conf
 !/.config/terminator
 !/.git_hooks/*
 !/.Xresources
