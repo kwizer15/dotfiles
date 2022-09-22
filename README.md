@@ -22,3 +22,9 @@ sudo sh -c 'echo "deb http://archive.getdeb.net/ubuntu zesty-getdeb apps" >> /et
 sudo apt update
 sudo apt install polybar
 ```
+
+## TODO:
+
+- Tester/Ajouter vim-fugitive
+- Tester vim-dadbod
+
