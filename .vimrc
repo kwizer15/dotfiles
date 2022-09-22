@@ -36,8 +36,11 @@ set hlsearch
 " Set the commands to save in history default number is 20.
 set history=1000
 
+"allows local vimrc
 set exrc
 set secure
+
+"fix lightline bug
 set laststatus=2
 set noshowmode
 
@@ -50,20 +53,24 @@ Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'StanAngeloff/php.vim'
 "Plug 'tpope/vim-commentary'
-"Plug 'stephpy/vim-php-cs-fixer'
+"Plug 'tpope/vim-surround'
+Plug 'stephpy/vim-php-cs-fixer'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'phpactor/phpactor', {'for': 'php', 'tag': '*', 'do': 'composer install --no-dev -o'}
 Plug 'neomake/neomake'
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'garbas/vim-snipmate'
+Plug 'vim-test/vim-test'
+"Plug 'tpope/vim-dadbod'
 call plug#end()
 
 set encoding=UTF-8
 let mapleader = " " " map leader to Space
+let g:snipMate = { 'snippet_version' : 1 }
 
 " ctags
 au BufWritePost *.php silent! !eval '[ -f ~/.git_hooks/ctags ] && ~/.git_hooks/ctags' 
-
-" Exit Vim if NERDTree is the only window remaining in the only tab.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
 " If another buffer tries to replace NERDTree, put it in the other window, and bring back NERDTree.
 "autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
@@ -75,7 +82,7 @@ let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', 
 " }}}
 
 let $FZF_DEFAULT_COMMAND = 'find .'
-
+"phpactor config
   augroup PhpactorMappings
     au!
     au FileType php nmap <buffer> <Leader>u :PhpactorImportClass<CR>
@@ -100,6 +107,7 @@ let $FZF_DEFAULT_COMMAND = 'find .'
         \ :<C-u>PhpactorExtractMethod<CR>
   augroup END
  
+"coc config
 " Select range based on AST
 nmap <silent><Leader>r <Plug>(coc-range-select)
 xmap <silent><Leader>r <Plug>(coc-range-select)
@@ -138,21 +146,41 @@ xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-nnoremap <leader>f :Files<CR>
-nnoremap <leader><S-f> :Ag<CR>
-
+"nerdtree config
 nnoremap <leader>t :NERDTreeFind<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 
+"custom mapping
 nnoremap <s-up> ddkP
 nnoremap <s-down> ddp
 nnoremap o o<esc>
 nnoremap O O<esc>
 
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
+"vim-test config
+nmap <silent> <leader>v :TestVisit<CR>
+nmap <silent> <leader>d :TestFile<CR>
+nmap <silent> <leader>l :TestLast<CR>
+nmap <silent> <leader>j :TestSuite<CR>
+nmap <silent> <leader>z :TestNearest<CR>
+let test#strategy = {
+  \ 'nearest': 'make',
+  \ 'last': 'make',
+  \ 'suite': 'make',
+  \ 'file': 'make',
+\}
+augroup test
+  autocmd!
+  autocmd BufWrite * if test#exists() |
+    \   TestFile |
+    \ endif
+augroup END
+let test#enabled_runners = ["php#phpunit"]
+
+"fzf config
 nnoremap <leader>a :Rg<space>
 nnoremap <leader>A :exec "Rg ".expand("<cword>")<cr>
-
+nnoremap <leader>f :Files<CR>
+nnoremap <leader><S-f> :Ag<CR>
 autocmd VimEnter * command! -nargs=* Rg
   \ call fzf#vim#grep(
   \   'rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1,
@@ -160,7 +188,29 @@ autocmd VimEnter * command! -nargs=* Rg
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
 
-"call neomake#configure#automake('nrwi', 500)
+"php-cs-fixer config
+autocmd BufWritePost *.php silent! call PhpCsFixerFixFile()
 
-" nnoremap <leader>c <home>i// <esc><down>
+"neomake config
+call neomake#configure#automake('nrwi', 500)
+
+let g:neomake_open_list = 2
+let g:neomake_php_phpstan_exe = './vendor/bin/phpstan'
+let g:neomake_php_phpstan_args = ['analyse', '--configuration=phpstan.neon', '--error-format', 'raw', '--no-progress']
+let g:php_cs_fixer_path = './vendor/bin/php-cs-fixer'
+let g:php_cs_fixer_config_file = './.php-cs-fixer.dist.php'
+
+"snippets config
+fun! Filename(...)
+  let template = get(a:000, 0, "$1")
+  let arg2 = get(a:000, 1, "")
+
+  let basename = expand('%:t:r')
+
+  if basename == ''
+    return arg2
+  else
+    return substitute(template, '$1', basename, 'g')
+  endif
+endf
 
