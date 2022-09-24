@@ -5,18 +5,9 @@
 	email = kwizer15@gmail.com
 
 [alias]
-	co = checkout
-	ci = commit
 	st = status
-	br = branch
-	lg = log --pretty=oneline --abbrev-commit --graph
-	changes = diff --name-status
-	undo = reset --soft HEAD^
-	amend = commit --amend
-	rbc = rebase --continue
-	rba = rebase --abort
-	rbs = rebase --skip
-	
+	lg = log --pretty=oneline --abbrev-commit --graph --all	
+
 [core]
 	excludesfile = ~/.gitignore_global
 	editor = vim

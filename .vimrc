@@ -11,6 +11,10 @@ set cursorline
 set shiftwidth=4
 set tabstop=4
 set expandtab
+
+" Do not save backup files.
+set nobackup
+
 set nowrap
 " Enable auto completion menu after pressing TAB.
 set wildmenu
@@ -51,7 +55,7 @@ Plug 'junegunn/fzf.vim'
 "Plug 'ryanoasis/vim-devicons'
 "Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'itchyny/lightline.vim'
-Plug 'StanAngeloff/php.vim'
+"Plug 'StanAngeloff/php.vim'
 "Plug 'tpope/vim-commentary'
 "Plug 'tpope/vim-surround'
 Plug 'stephpy/vim-php-cs-fixer'
@@ -63,6 +67,7 @@ Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
 Plug 'vim-test/vim-test'
 "Plug 'tpope/vim-dadbod'
+Plug 'tpope/vim-fugitive'
 call plug#end()
 
 set encoding=UTF-8
@@ -83,29 +88,29 @@ let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', 
 
 let $FZF_DEFAULT_COMMAND = 'find .'
 "phpactor config
-  augroup PhpactorMappings
-    au!
-    au FileType php nmap <buffer> <Leader>u :PhpactorImportClass<CR>
-    au FileType php nmap <buffer> <Leader>e :PhpactorClassExpand<CR>
-    au FileType php nmap <buffer> <Leader>ua :PhpactorImportMissingClasses<CR>
-    au FileType php nmap <buffer> <Leader>mm :PhpactorContextMenu<CR>
-    au FileType php nmap <buffer> <Leader>nn :PhpactorNavigate<CR>
-    au FileType php,cucumber nmap <buffer> <Leader>o
-        \ :PhpactorGotoDefinition edit<CR>
-    au FileType php nmap <buffer> <Leader>K :PhpactorHover<CR>
-    au FileType php nmap <buffer> <Leader>tt :PhpactorTransform<CR>
-    au FileType php nmap <buffer> <Leader>cc :PhpactorClassNew<CR>
-    au FileType php nmap <buffer> <Leader>ci :PhpactorClassInflect<CR>
-    au FileType php nmap <buffer> <Leader>fr :PhpactorFindReferences<CR>
-    au FileType php nmap <buffer> <Leader>mf :PhpactorMoveFile<CR>
-    au FileType php nmap <buffer> <Leader>cf :PhpactorCopyFile<CR>
-    au FileType php nmap <buffer> <silent> <Leader>ee
-        \ :PhpactorExtractExpression<CR>
-    au FileType php vmap <buffer> <silent> <Leader>ee
-        \ :<C-u>PhpactorExtractExpression<CR>
-    au FileType php vmap <buffer> <silent> <Leader>em
-        \ :<C-u>PhpactorExtractMethod<CR>
-  augroup END
+augroup PhpactorMappings
+  au!
+  au FileType php nmap <buffer> <Leader>u :PhpactorImportClass<CR>
+  au FileType php nmap <buffer> <Leader>e :PhpactorClassExpand<CR>
+  au FileType php nmap <buffer> <Leader>ua :PhpactorImportMissingClasses<CR>
+  au FileType php nmap <buffer> <Leader>mm :PhpactorContextMenu<CR>
+  au FileType php nmap <buffer> <Leader>nn :PhpactorNavigate<CR>
+  au FileType php,cucumber nmap <buffer> <Leader>o
+              \ :PhpactorGotoDefinition edit<CR>
+  au FileType php nmap <buffer> <Leader>K :PhpactorHover<CR>
+  au FileType php nmap <buffer> <Leader>tt :PhpactorTransform<CR>
+  au FileType php nmap <buffer> <Leader>cc :PhpactorClassNew<CR>
+  au FileType php nmap <buffer> <Leader>ci :PhpactorClassInflect<CR>
+  au FileType php nmap <buffer> <Leader>fr :PhpactorFindReferences<CR>
+  au FileType php nmap <buffer> <Leader>mf :PhpactorMoveFile<CR>
+  au FileType php nmap <buffer> <Leader>cf :PhpactorCopyFile<CR>
+  au FileType php nmap <buffer> <silent> <Leader>ee
+              \ :PhpactorExtractExpression<CR>
+  au FileType php vmap <buffer> <silent> <Leader>ee
+              \ :<C-u>PhpactorExtractExpression<CR>
+  au FileType php vmap <buffer> <silent> <Leader>em
+              \ :<C-u>PhpactorExtractMethod<CR>
+augroup END
  
 "coc config
 " Select range based on AST
@@ -193,7 +198,7 @@ autocmd BufWritePost *.php silent! call PhpCsFixerFixFile()
 
 "neomake config
 call neomake#configure#automake('nrwi', 500)
-
+"let g:neomake_logfile = '/tmp/neomake.log'
 let g:neomake_open_list = 2
 let g:neomake_php_phpstan_exe = './vendor/bin/phpstan'
 let g:neomake_php_phpstan_args = ['analyse', '--configuration=phpstan.neon', '--error-format', 'raw', '--no-progress']
