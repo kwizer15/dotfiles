@@ -1,0 +1,26 @@
+snippet vimrc
+	"neomake
+	let g:neomake_logfile = '/tmp/neomake.log'
+	let g:neomake_php_php_exe = 'docker-compose'
+	let g:neomake_php_php_args = ['run', '--rm', 'php', 'php', '-l', '-d', 'display_errors=1', '-d', 'log_errors=0', '-d', 'xdebug.cli_color=0'] 
+	let g:neomake_php_php_output_stream = 'both'
+	let g:neomake_php_php_remove_invalid_entries = 1
+	let g:neomake_php_phpstan_exe = 'docker-compose'
+	let g:neomake_php_phpstan_args = ['run', '--rm', 'php', 'php', './vendor/bin/phpstan', 'analyse', '--error-format', 'raw', '--no-progress', '--configuration', 'phpstan.neon'] 
+	let g:neomake_php_phpstan_remove_invalid_entries = 1
+	"let g:neomake_php_phpcsfixer_maker = {
+	"		\ 'exe': 'docker-compose',
+	"		\ 'args': ['run', '--rm', 'php', 'php', './vendor/bin/php-cs-fixer', '--dry-run'],
+	"		\ 'errorformat':
+	"		\   '%E%m',
+	"		\ }
+	"let g:neomake_php_enabled_makers = ['php', 'phpstan', 'phpcsfixer']
+
+	" vim-test
+	let g:test#php#phpunit#executable = 'docker-compose run --rm php php ./vendor/bin/phpunit'
+
+	" php-cs-fixer
+	let g:php_cs_fixer_php_path = 'docker-compose run --rm php php'
+	let g:php_cs_fixer_path = './vendor/bin/php-cs-fixer'
+	let g:php_cs_fixer_config_file = './.php-cs-fixer.dist.php'
+	let g:php_cs_fixer_level = 'all'

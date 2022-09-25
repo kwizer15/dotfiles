@@ -160,7 +160,7 @@ nnoremap <s-up> ddkP
 nnoremap <s-down> ddp
 nnoremap o o<esc>
 nnoremap O O<esc>
-
+map <M-V> <C-V>
 "vim-test config
 nmap <silent> <leader>v :TestVisit<CR>
 nmap <silent> <leader>d :TestFile<CR>
@@ -172,10 +172,10 @@ let test#strategy = {
   \ 'last': 'make',
   \ 'suite': 'make',
   \ 'file': 'make',
-\}
+\}"
 augroup test
   autocmd!
-  autocmd BufWrite * if test#exists() |
+  autocmd BufWritePost * if test#exists() |
     \   TestFile |
     \ endif
 augroup END
@@ -194,7 +194,9 @@ autocmd VimEnter * command! -nargs=* Rg
   \   <bang>0)
 
 "php-cs-fixer config
-autocmd BufWritePost *.php silent! call PhpCsFixerFixFile()
+autocmd BufWritePost *.php call PhpCsFixerFix(expand('%'), g:php_cs_fixer_dry_run)
+let g:php_cs_fixer_path = './vendor/bin/php-cs-fixer'
+let g:php_cs_fixer_config_file = './.php-cs-fixer.dist.php'
 
 "neomake config
 call neomake#configure#automake('nrwi', 500)
@@ -202,8 +204,6 @@ call neomake#configure#automake('nrwi', 500)
 let g:neomake_open_list = 2
 let g:neomake_php_phpstan_exe = './vendor/bin/phpstan'
 let g:neomake_php_phpstan_args = ['analyse', '--configuration=phpstan.neon', '--error-format', 'raw', '--no-progress']
-let g:php_cs_fixer_path = './vendor/bin/php-cs-fixer'
-let g:php_cs_fixer_config_file = './.php-cs-fixer.dist.php'
 
 "snippets config
 fun! Filename(...)
