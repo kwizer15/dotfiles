@@ -1,14 +1,8 @@
-# Ceci est le fichier de configuration personnel de Git.
 [user]
-# Veuillez adapter et décommenter les lignes suivantes :
-	name = KwiZeR15
-	email = kwizer15@gmail.com
-
+	email = ebernaszuk@nodevo.com
+	name = Emmanuel Bernaszuk
+[core]
+	excludesFile = ~/.gitignore_global
+	editor = vim
 [alias]
 	st = status
-	lg = log --pretty=oneline --abbrev-commit --graph --all	
-
-[core]
-	excludesfile = ~/.gitignore_global
-	editor = vim
-	hooksPath = /home/emmanuel/.git_hooks
