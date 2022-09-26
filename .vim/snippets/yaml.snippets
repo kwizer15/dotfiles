@@ -1,0 +1,218 @@
+snippets gitlabci
+	include:
+	  - project: 'nodevo/packages/devops'
+		ref: main
+		file: '/gitlab-ci/.gitlab-ci.deployment.yml'
+
+	.need_php:
+	  before_script:
+		- docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+		- docker-compose pull php
+	  needs: []
+
+	.backend_cache: &backend_cache
+	  key:
+		files:
+		  - composer.lock
+	  paths:
+		- vendor
+	  policy: pull
+
+	.assets_cache: &assets_cache
+	  key:
+		files:
+		  - package-lock.json
+	  paths:
+		- node_modules
+		- public/build
+	  policy: pull
+
+	stages:
+	  - install
+	  - build
+	  - quality-assurance
+	  - test
+	  - deploy
+
+	image: mykiwi/docker
+
+	services:
+	  - docker:dind
+
+	variables:
+	  DOCKER_DRIVER: overlay2
+	  DOCKER_COMPOSE_OPTS: "-f docker-compose.yaml"
+	  GIT_SUBMODULE_STRATEGY: recursive
+
+	#create_image_php:
+	#  stage: install
+	#  before_script:
+	#    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+	#  script:
+	#    - make rebuild/php
+	#    - docker-compose push php
+	#    - make rebuild/consumer
+	#    - docker-compose push consumer
+	#  needs: []
+
+	phpcs:
+	  stage: quality-assurance
+	  script:
+		- make phpcs
+	  needs: []
+
+	phpmetrics:
+	  stage: quality-assurance
+	  script:
+		- make phpmetrics
+	  artifacts:
+		paths:
+		  - var/artefacts/phpmetrics
+		expire_in: 1 week
+	  needs: []
+
+	phpstan:
+	  extends: [.need_php]
+	  stage: quality-assurance
+	  script:
+		- make cache-warmup
+		- make phpstan
+	  cache:
+		- <<: *backend_cache
+	  needs:
+		- build_composer
+
+	lint:
+	  extends: [.need_php]
+	  stage: quality-assurance
+	  script:
+		- make lint-composer
+		- make lint-twig
+		- make lint-yaml
+		- make lint-doctrine
+	  cache:
+		- <<: *backend_cache
+	  needs:
+		- build_composer
+
+	build_composer:
+	  extends: [.need_php]
+	  stage: build
+	  script:
+		- make vendor
+	  cache:
+		- <<: *backend_cache
+		  policy: pull-push
+
+	build_assets:
+	  stage: build
+	  script:
+		- make assets-build
+	  cache:
+		- <<: *assets_cache
+		  policy: pull-push
+	  needs: []
+
+	phpunit:
+	  stage: test
+	  extends: [.need_php]
+	  script:
+		- docker-compose pull consumer
+		- make up
+		- make database-fixtures
+		- make tests
+	  cache:
+		- <<: *backend_cache
+		- <<: *assets_cache
+	  needs:
+		- build_composer
+
+	staging_gtf:
+	  variables:
+		NAME: staging
+		URL: https://preprod.gtf-candidat.nodevo09.com
+		SERVER: nodevo09
+		PROJECT_DIR: /home/webadmin/web/gtf_candidat_deployment/web/gtf
+	  extends: [.environment]
+	  only:
+		- feat/sf5
+		- ${STAGING_BRANCH}
+
+snippets docker-compose
+	version: '3'
+
+	services:
+	  php:
+		build:
+		  context: .devops/docker/php
+		  args:
+			PHP_VERSION: 8.1
+			WITH_GD: 1
+			WITH_WKHTMLTOPDF: 1
+			WITH_AMQP: 1
+			WITH_SOCKETS: 1
+		image: registry.gitlab.com/nodevo/gtf/gtf_candidat/php:${PHP_IMAGE_TAG:-latest}
+		volumes:
+		  - .:/srv:rw,cached
+		environment:
+		  - APP_ENV
+
+	  consumer:
+		build:
+		  context: .devops/docker/php
+		  args:
+			PHP_VERSION: 8.1
+			WITH_GD: 1
+			WITH_WKHTMLTOPDF: 1
+			WITH_GHOSTSCRIPT: 1
+			WITH_AMQP: 1
+			WITH_SOCKETS: 1
+		image: registry.gitlab.com/nodevo/gtf/gtf_candidat/consumer:${PHP_IMAGE_TAG:-latest}
+		volumes:
+		  - .:/srv:rw,cached
+		environment:
+		  - APP_ENV
+		entrypoint: ['php', 'bin/console', 'rabbitmq:consumer', 'generate_record_pdf']
+		depends_on:
+		  - rabbitmq
+
+	  web:
+		build:
+		  context: ./.devops/docker/nginx/symfony
+		volumes:
+		  - ./public:/srv/public:cached
+
+	  db:
+		image: mysql:5.6
+		environment:
+		  MYSQL_ROOT_PASSWORD: root
+		  MYSQL_DATABASE: espace_candidat
+		volumes:
+		  - db-data:/var/lib/mysql:rw
+
+	  mailbox:
+		image: mailhog/mailhog
+
+	  node:
+		build:
+		  context: .devops/docker/node
+		  args:
+			NODE_VERSION: 10
+			WITH_PYTHON: 1
+		working_dir: /app
+		volumes:
+		  - ./:/app
+
+	  rabbitmq:
+		image: rabbitmq:3.10-alpine
+		environment:
+		  RABBITMQ_DEFAULT_VHOST: vhostname
+
+	  ftp:
+		image: delfer/alpine-ftp-server
+		environment:
+		  USERS: 'nodevo|nodevo'
+
+	volumes:
+	  db-data:
+

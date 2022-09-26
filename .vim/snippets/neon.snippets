@@ -1,0 +1,12 @@
+snippet phpstan
+	includes:
+		- phpstan-baseline.neon
+
+	parameters:
+		level: max
+		symfony:
+			container_xml_path: %rootDir%/../../../var/cache/dev/App_KernelDevDebugContainer.xml
+			constant_hassers: false
+		ignoreErrors:
+		excludePaths:
+	#    reportUnmatchedIgnoredErrors: false
